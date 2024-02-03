@@ -1,0 +1,26 @@
+{
+  "name": "apiedupayv2",
+  "version": "1.0.0",
+  "description": "api para los usuarios de eduapay",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "start": ""
+  },
+  "author": "",
+  "license": "ISC",
+  "keywords": [],
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "prisma": "^5.9.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.9.1",
+    "bcryptjs": "^2.4.3",
+    "express": "^4.18.2",
+    "mongoose": "^8.1.1"
+  }
+}

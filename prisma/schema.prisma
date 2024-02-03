@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model actividadesextra {
+  Id           Int       @id @default(autoincrement())
+  Nombre       String?   @db.VarChar(50)
+  Descripcion  String?   @db.VarChar(200)
+  Precio       Decimal?  @db.Decimal(10, 2)
+  Imagen       String?   @db.VarChar(200)
+  Fecha_Inicio DateTime? @db.Date
+  Fecha_Fin    DateTime? @db.Date
+  pagos        pagos[]
+}
+
+model grados {
+  Id        Int        @id @default(autoincrement())
+  Nombre    String?    @db.VarChar(20)
+  IdPeriodo Int
+  periodos  periodos   @relation(fields: [IdPeriodo], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "grados_ibfk_1")
+  grupos    grupos[]
+  usuarios  usuarios[]
+
+  @@index([IdPeriodo], map: "IdPeriodo")
+}
+
+model grupos {
+  Id       Int        @id @default(autoincrement())
+  Nombre   String?    @db.VarChar(50)
+  Cupo     Int?
+  IdGrado  Int
+  grados   grados     @relation(fields: [IdGrado], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "grupos_ibfk_1")
+  usuarios usuarios[]
+
+  @@index([IdGrado], map: "IdGrado")
+}
+
+model metodospago {
+  Id          Int     @id @default(autoincrement())
+  Nombre      String? @db.VarChar(50)
+  Descripcion String? @db.VarChar(200)
+}
+
+model pagos {
+  Id                Int              @id @default(autoincrement())
+  Monto             Decimal          @db.Decimal(10, 2)
+  Fecha_Pago        DateTime         @default(now()) @db.DateTime(0)
+  MetodoPago        Int
+  Referencia        String           @db.Char(10)
+  Estado            String           @db.VarChar(50)
+  Id_Usuario        Int
+  Id_Periodo        Int
+  Id_ActividadExtra Int
+  usuarios          usuarios         @relation(fields: [Id_Usuario], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "pagos_ibfk_1")
+  periodos          periodos         @relation(fields: [Id_Periodo], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "pagos_ibfk_2")
+  actividadesextra  actividadesextra @relation(fields: [Id_ActividadExtra], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "pagos_ibfk_3")
+
+  @@index([Id_ActividadExtra], map: "Id_ActividadExtra")
+  @@index([Id_Periodo], map: "Id_Periodo")
+  @@index([Id_Usuario], map: "Id_Usuario")
+}
+
+model periodos {
+  Id           Int        @id @default(autoincrement())
+  Nombre       String?    @db.VarChar(100)
+  Precio       Decimal?   @db.Decimal(10, 2)
+  Fecha_Inicio DateTime?  @db.Date
+  Fecha_Fin    DateTime?  @db.Date
+  grados       grados[]
+  pagos        pagos[]
+  usuarios     usuarios[]
+}
+
+model usuarios {
+  Id                Int       @id @default(autoincrement())
+  Nombre            String?   @db.VarChar(100)
+  Apellido          String?   @db.VarChar(100)
+  CorreoElectronico String?   @db.VarChar(50)
+  Contrasena        String?   @db.VarChar(200)
+  FotoPerfil        String?   @db.VarChar(200)
+  Id_Periodo        Int?
+  Id_Grado          Int?
+  Id_Grupo          Int?
+  Rol               String?   @db.VarChar(50)
+  pagos             pagos[]
+  periodos          periodos? @relation(fields: [Id_Periodo], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "usuarios_ibfk_1")
+  grados            grados?   @relation(fields: [Id_Grado], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "usuarios_ibfk_2")
+  grupos            grupos?   @relation(fields: [Id_Grupo], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "usuarios_ibfk_3")
+
+  @@index([Id_Grado], map: "Id_Grado")
+  @@index([Id_Grupo], map: "Id_Grupo")
+  @@index([Id_Periodo], map: "Id_Periodo")
+}
